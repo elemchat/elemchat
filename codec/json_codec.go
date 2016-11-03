@@ -10,6 +10,10 @@ var _ Codec = (*jsonCodec)(nil)
 
 type jsonCodec struct{}
 
+func JsonCodec() Codec {
+	return (*jsonCodec)(nil)
+}
+
 func (c *jsonCodec) Encode(m msg.Message) ([]byte, error) {
 	if m == nil {
 		return nil, ErrMessageNil

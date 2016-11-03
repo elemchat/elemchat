@@ -8,7 +8,7 @@ import (
 )
 
 func TestJsonCodec_Encode(t *testing.T) {
-	codec := &jsonCodec{}
+	codec := JsonCodec()
 	json, err := codec.Encode(&msg.Chat{Text: "hello codec!"})
 	if err != nil {
 		t.Error(err)
