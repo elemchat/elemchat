@@ -51,15 +51,3 @@ func (c *jsonCodec) Decode(data []byte) (msg.Message, error) {
 		return json.Unmarshal(mdata, m)
 	})
 }
-
-func unmarshalMsg(data []byte, m msg.Message) (msg.Message, error) {
-	if m == nil {
-		return nil, ErrMessageNil
-	}
-
-	err := json.Unmarshal(data, m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
