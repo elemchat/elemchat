@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elemchat/elemchat/magic"
 	"github.com/elemchat/elemchat/msg"
 )
 
@@ -18,14 +19,25 @@ func TestJsonCodec_Encode(t *testing.T) {
 	if string(json) != `{"msg":{"text":"hello codec!"},"type":"chat"}` {
 		t.Error(fmt.Sprintf("expect "+
 			`{"msg":{"text":"hello codec!"},"type":"chat"},"type":"CHAT"}`+
-			" got %s",
-			string(json)))
+			" got %s", string(json)))
 		return
 	}
 
 	_, err = codec.Encode(nil)
 	if err != ErrMessageNil {
 		t.Error("expect ErrMessageNil got ", err)
+		return
+	}
+
+	json, err = codec.Encode(&msg.Magic{Magic: magic.FIRE_BALL})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if string(json) != `{"msg":{"magic":"fireBall"},"type":"magic"}` {
+		t.Error(fmt.Sprintf("expect "+
+			`{"msg":{"magic":"fireBall"},"type":"magic"}`+
+			" got %s", string(json)))
 		return
 	}
 }
