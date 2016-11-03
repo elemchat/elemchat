@@ -1,6 +1,5 @@
 package msg
 
-//go:generate stringer -type=Type type.go
 type Type int
 
 const (
