@@ -43,8 +43,8 @@ func TestJsonCodec_Decode(t *testing.T) {
 		return
 	}
 
-	if m.Type() != msg.CHAT {
-		t.Error("expect", msg.CHAT, "got", m.Type())
+	if msg.GetType(m) != msg.CHAT {
+		t.Error("expect", msg.CHAT, "got", msg.GetType(m))
 		return
 	}
 	switch m := m.(type) {

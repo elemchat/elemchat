@@ -21,7 +21,7 @@ func (c *jsonCodec) Encode(m msg.Message) ([]byte, error) {
 	}
 
 	j := make(map[string]interface{})
-	j["type"] = m.Type().String()
+	j["type"] = msg.GetType(m).String()
 	j["msg"] = m
 	return json.Marshal(j)
 }

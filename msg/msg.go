@@ -17,7 +17,11 @@ var (
 )
 
 type Message interface {
-	Type() Type
+	_type() Type
+}
+
+func GetType(msg Message) Type {
+	return msg._type()
 }
 
 type Init struct {
@@ -45,24 +49,24 @@ type Effect struct {
 type Dualover struct {
 }
 
-func (_ *Init) Type() Type {
+func (_ *Init) _type() Type {
 	return INIT
 }
-func (_ *WaitChat) Type() Type {
+func (_ *WaitChat) _type() Type {
 	return WAIT_CHAT
 }
-func (_ *WaitMagic) Type() Type {
+func (_ *WaitMagic) _type() Type {
 	return WAIT_MAGIC
 }
-func (_ *Chat) Type() Type {
+func (_ *Chat) _type() Type {
 	return CHAT
 }
-func (_ *Magic) Type() Type {
+func (_ *Magic) _type() Type {
 	return MAGIC
 }
-func (_ *Effect) Type() Type {
+func (_ *Effect) _type() Type {
 	return EFFECT
 }
-func (_ *Dualover) Type() Type {
+func (_ *Dualover) _type() Type {
 	return DUALOVER
 }
