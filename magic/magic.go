@@ -7,9 +7,7 @@ const (
 	FIRE_BALL
 	WATER_WALL
 	GRASS_GROWTH
-	size
-)
 
-func Size() int {
-	return int(size)
-}
+	// length of magic
+	magicLength
+)
