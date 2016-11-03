@@ -24,19 +24,19 @@ type Init struct {
 }
 
 type WaitChat struct {
-	Deadline time.Time
+	Deadline time.Time `json:"deadline"`
 }
 
 type WaitMagic struct {
-	Deadline time.Time
+	Deadline time.Time `json:"deadline"`
 }
 
 type Chat struct {
-	Text string
+	Text string `json:"text"`
 }
 
 type Magic struct {
-	Magic magic.Magic
+	Magic magic.Magic `json:"magic"`
 }
 
 type Effect struct {
