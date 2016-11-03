@@ -36,11 +36,17 @@ func ToMagic(m string) Magic {
 	return ILLEGAL
 }
 
-func (m *Magic) MarshalJSON() ([]byte, error) {
+func (m Magic) MarshalJSON() ([]byte, error) {
 	return []byte("\"" + m.String() + "\""), nil
 }
 
 func (m *Magic) UnmarshalJSON(data []byte) error {
+	if len(data) < 2 {
+		*m = ILLEGAL
+		return nil
+	}
+
+	data = data[1 : len(data)-1]
 	*m = ToMagic(string(data))
 	return nil
 }

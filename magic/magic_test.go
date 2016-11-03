@@ -34,10 +34,7 @@ func TestToMagic(t *testing.T) {
 	}
 }
 
-func TestMagic_JsonMarshal(t *testing.T) {
-	type container struct {
-		Magic Magic `json:"magic"`
-	}
+func TestMagic_MarshalJson(t *testing.T) {
 	for _, c := range cases {
 		data, err := json.Marshal(&c.Magic)
 		if err != nil {
@@ -47,6 +44,21 @@ func TestMagic_JsonMarshal(t *testing.T) {
 
 		if string(data) != fmt.Sprintf("%q", c.String) {
 			t.Error("expect", fmt.Sprintf("%q", c.String), "got", string(data))
+		}
+	}
+}
+
+func TestMagic_UnmarshalJson(t *testing.T) {
+	for _, c := range cases {
+		var m Magic
+		err := json.Unmarshal([]byte(fmt.Sprintf("%q", c.String)), &m)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		if m != c.Magic {
+			t.Error("expect", c.Magic, "got", m)
 		}
 	}
 }
