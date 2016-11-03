@@ -35,3 +35,12 @@ func ToMagic(m string) Magic {
 	}
 	return ILLEGAL
 }
+
+func (m *Magic) MarshalJSON() ([]byte, error) {
+	return []byte("\"" + m.String() + "\""), nil
+}
+
+func (m *Magic) UnmarshalJSON(data []byte) error {
+	*m = ToMagic(string(data))
+	return nil
+}
