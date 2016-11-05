@@ -36,9 +36,10 @@ func (m *message) Msg() msg.Message {
 }
 
 type Wizard struct {
-	conn  conn.Conn
-	codec codec.Codec
-	recv  chan<- Message
+	conn   conn.Conn
+	codec  codec.Codec
+	recv   chan<- Message
+	closed chan struct{}
 
 	Name string
 
@@ -49,11 +50,12 @@ type Wizard struct {
 func New(name string, attr Attr,
 	conn conn.Conn, codec codec.Codec, recv chan<- Message) *Wizard {
 	w := &Wizard{
-		conn:  conn,
-		codec: codec,
-		recv:  recv,
-		Name:  name,
-		Attr:  attr,
+		conn:   conn,
+		codec:  codec,
+		recv:   recv,
+		closed: make(chan struct{}),
+		Name:   name,
+		Attr:   attr,
 	}
 
 	go w.recvLoop()
@@ -61,20 +63,28 @@ func New(name string, attr Attr,
 }
 
 func (w *Wizard) Closed() bool {
-	if w.conn == nil {
+	select {
+	case <-w.closed:
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
-func (w *Wizard) Close() {
+// NOTE:
+// While call .Close(),caller show receive all message in .recv chan
+// before close recv chan.
+// If do not,DEADLOCK maybe occur!
+func (w *Wizard) Close(wait bool) {
 	w.close()
+	if wait {
+		<-w.closed
+	}
 }
 
 func (w *Wizard) close() {
-	if w.conn != nil {
+	if !w.Closed() {
 		w.conn.Close()
-		w.conn = nil
 	}
 }
 
@@ -106,6 +116,7 @@ func (w *Wizard) Send(msg msg.Message) bool {
 }
 
 func (w *Wizard) recvLoop() {
+	defer close(w.closed)
 	defer func() {
 		if r := recover(); r != nil {
 			if fmt.Sprint(r) == "send on closed channel" {
@@ -116,6 +127,7 @@ func (w *Wizard) recvLoop() {
 		}
 	}()
 	for {
+
 		// read
 		if w.conn == nil {
 			return
@@ -125,6 +137,7 @@ func (w *Wizard) recvLoop() {
 			// handle err
 			if err == conn.ErrClosed {
 				w.close()
+				return
 			}
 			continue
 		}
