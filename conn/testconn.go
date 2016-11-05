@@ -61,6 +61,8 @@ func (conn *testConn) Read() (msg []byte, err error) {
 	defer conn.rlock.Unlock()
 
 	select {
+	case <-conn.closed:
+		return nil, ErrClosed
 	case <-conn.readDeadline:
 		return nil, ErrReadTimeout
 	case data, ok := <-conn.rd:
@@ -84,6 +86,8 @@ func (conn *testConn) Write(msg []byte) error {
 	defer conn.wlock.Unlock()
 
 	select {
+	case <-conn.closed:
+		return ErrClosed
 	case <-conn.writeDeadline:
 		return ErrWriteTimeout
 	case conn.wt <- msg:
