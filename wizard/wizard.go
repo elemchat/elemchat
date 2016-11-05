@@ -1,6 +1,7 @@
 package wizard
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elemchat/elemchat/codec"
@@ -37,7 +38,7 @@ func (m *message) Msg() msg.Message {
 type Wizard struct {
 	conn  conn.Conn
 	codec codec.Codec
-	recv  chan<- Message // closed by other,not Wizard
+	recv  chan<- Message
 
 	Name string
 
@@ -65,6 +66,11 @@ func (w *Wizard) Closed() bool {
 	}
 	return false
 }
+
+func (w *Wizard) Close() {
+	w.close()
+}
+
 func (w *Wizard) close() {
 	if w.conn != nil {
 		w.conn.Close()
@@ -100,6 +106,15 @@ func (w *Wizard) Send(msg msg.Message) bool {
 }
 
 func (w *Wizard) recvLoop() {
+	defer func() {
+		if r := recover(); r != nil {
+			if fmt.Sprint(r) == "send on closed channel" {
+				w.close()
+			} else {
+				panic(r)
+			}
+		}
+	}()
 	for {
 		// read
 		if w.conn == nil {
@@ -111,6 +126,7 @@ func (w *Wizard) recvLoop() {
 			if err == conn.ErrClosed {
 				w.close()
 			}
+			continue
 		}
 
 		// decode
