@@ -7,9 +7,24 @@ import (
 	"time"
 )
 
-func TestTestPair(t *testing.T) {
+type ConnPairFunc func() (Conn, Conn)
+
+func TestConn(t *testing.T) {
+	t.Run("TestPair", func(t *testing.T) {
+		subtest_Conn(t, func() (Conn, Conn) {
+			return TestPair()
+		})
+	})
+}
+
+func subtest_Conn(t *testing.T, pairFn ConnPairFunc) {
+	if pairFn == nil {
+		t.Error("ConnPairFunc equal nil")
+		return
+	}
+
 	wait := func(fs func(s Conn), fc func(c Conn)) {
-		s, c := TestPair()
+		s, c := pairFn()
 		wg := &sync.WaitGroup{}
 		wg.Add(2)
 
