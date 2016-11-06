@@ -34,6 +34,7 @@ func (m *message) Msg() msg.Message {
 type Wizard struct {
 	conn   conn.Conn
 	codec  codec.Codec
+	config *Config // read-only
 	recv   chan<- Message
 	closed chan struct{}
 
@@ -48,10 +49,29 @@ func New(name string, attr attr.Attr,
 	w := &Wizard{
 		conn:   conn,
 		codec:  codec,
+		config: DefaultConfig(),
 		recv:   recv,
 		closed: make(chan struct{}),
 		Name:   name,
 		Attr:   attr,
+	}
+
+	go w.recvLoop()
+	return w
+}
+
+func NewWithConfig(config *Config,
+	name string,
+	conn conn.Conn, codec codec.Codec,
+	recv chan<- Message) *Wizard {
+	w := &Wizard{
+		conn:   conn,
+		codec:  codec,
+		config: config,
+		recv:   recv,
+		closed: make(chan struct{}),
+		Name:   name,
+		Attr:   config.DefaultAttr,
 	}
 
 	go w.recvLoop()
@@ -99,10 +119,14 @@ func (w *Wizard) Send(msg msg.Message) bool {
 	}
 
 	// write
+	w.conn.SetWriteDeadline(time.Now().Add(w.config.WriteTimeout))
 	err = w.conn.Write(data)
 	if err != nil {
 		// handle err
 		if err == conn.ErrClosed {
+			w.close()
+		}
+		if err == conn.ErrWriteTimeout {
 			w.close()
 		}
 
@@ -128,10 +152,15 @@ func (w *Wizard) recvLoop() {
 		if w.conn == nil {
 			return
 		}
+		w.conn.SetReadDeadline(time.Now().Add(w.config.ReadTimeout))
 		data, err := w.conn.Read()
 		if err != nil {
 			// handle err
 			if err == conn.ErrClosed {
+				w.close()
+				return
+			}
+			if err == conn.ErrReadTimeout {
 				w.close()
 				return
 			}
