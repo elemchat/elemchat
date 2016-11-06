@@ -11,6 +11,8 @@ type Type int
 const (
 	ILLEGAL Type = iota
 	AUTH
+	TIME_SYNC_REQ
+	TIME_SYNC_RESP
 	INIT
 	WAIT_CHAT
 	WAIT_MAGIC
@@ -29,6 +31,10 @@ func (t Type) String() string {
 		return "illegal"
 	case AUTH:
 		return "auth"
+	case TIME_SYNC_REQ:
+		return "timeSyncReq"
+	case TIME_SYNC_RESP:
+		return "timeSyncResp"
 	case INIT:
 		return "init"
 	case WAIT_CHAT:
@@ -54,6 +60,10 @@ func ToType(t string) Type {
 		return ILLEGAL
 	case "auth":
 		return AUTH
+	case "timeSyncReq":
+		return TIME_SYNC_REQ
+	case "timeSyncResp":
+		return TIME_SYNC_RESP
 	case "init":
 		return INIT
 	case "waitChat":
@@ -87,6 +97,10 @@ func Decode(t Type, fn DecodeFunc) (Message, error) {
 		return nil, ErrIllegal
 	case AUTH:
 		return unmarshalMsg(&Auth{})
+	case TIME_SYNC_REQ:
+		return unmarshalMsg(&TimeSyncReq{})
+	case TIME_SYNC_RESP:
+		return unmarshalMsg(&TimeSyncResp{})
 	case INIT:
 		return unmarshalMsg(&Init{})
 	case WAIT_CHAT:

@@ -49,6 +49,53 @@ type Auth struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`
 }
+
+type TimeSyncReq struct {
+	T0 time_Time `json:"t0"`
+}
+
+func (tsr TimeSyncReq) GetT0() time.Time {
+	return time.Time(tsr.T0)
+}
+
+func (tsr *TimeSyncReq) SetT0(t time.Time) *TimeSyncReq {
+	tsr.T0 = time_Time(t)
+	return tsr
+}
+
+type TimeSyncResp struct {
+	T0 time_Time `json:"t0"`
+	T1 time_Time `json:"t1"`
+	T2 time_Time `json:"t2"`
+}
+
+func (tsr TimeSyncResp) GetT0() time.Time {
+	return time.Time(tsr.T0)
+}
+
+func (tsr *TimeSyncResp) SetT0(t time.Time) *TimeSyncResp {
+	tsr.T0 = time_Time(t)
+	return tsr
+}
+
+func (tsr TimeSyncResp) GetT1() time.Time {
+	return time.Time(tsr.T1)
+}
+
+func (tsr *TimeSyncResp) SetT1(t time.Time) *TimeSyncResp {
+	tsr.T1 = time_Time(t)
+	return tsr
+}
+
+func (tsr TimeSyncResp) GetT2() time.Time {
+	return time.Time(tsr.T2)
+}
+
+func (tsr *TimeSyncResp) SetT2(t time.Time) *TimeSyncResp {
+	tsr.T2 = time_Time(t)
+	return tsr
+}
+
 type Init struct {
 	Attrs map[string]attr.Attr `json:"attrs"`
 }
@@ -92,6 +139,12 @@ type Dualover struct {
 
 func (_ *Auth) _type() Type {
 	return AUTH
+}
+func (_ *TimeSyncReq) _type() Type {
+	return TIME_SYNC_REQ
+}
+func (_ *TimeSyncResp) _type() Type {
+	return TIME_SYNC_RESP
 }
 func (_ *Init) _type() Type {
 	return INIT
