@@ -1,8 +1,8 @@
 package field
 
 import (
+	"reflect"
 	"testing"
-	"time"
 
 	"github.com/elemchat/elemchat/codec"
 	"github.com/elemchat/elemchat/conn"
@@ -11,23 +11,48 @@ import (
 )
 
 func TestNew_Enter(t *testing.T) {
-	field := New()
+	msgch := make(chan wizard.Message)
 	s, c := conn.TestPair()
+	field := New(func(message wizard.Message) {
+		msgch <- message
+	})
+
 	field.Enter(func(recv chan<- wizard.Message) *wizard.Wizard {
-		return wizard.New("mofon",
+		return wizard.New("wizard",
 			wizard.Attr{Blood: 10}, s, codec.JsonCodec(), recv)
 
 	})
-	s2, c2 := conn.TestPair()
-	field.Enter(func(recv chan<- wizard.Message) *wizard.Wizard {
-		return wizard.New("wizard",
-			wizard.Attr{Blood: 10}, s2, codec.JsonCodec(), recv)
 
-	})
 	send(c, &msg.Chat{Text: "hello field!"})
-	send(c2, &msg.Chat{Text: "hello field!"})
+	message := <-msgch
+	if message.Wizard().Name != "wizard" {
+		t.Error("expect wizard got", message.Wizard().Name)
+		return
+	}
+	if msg.GetType(message.Msg()) != msg.CHAT {
+		t.Error("expect", msg.CHAT, "got", msg.GetType(message.Msg()))
+		return
+	}
+	if m, ok := message.Msg().(*msg.Chat); !ok {
+		t.Error("expect *msg.Chat got", reflect.TypeOf(message.Msg()))
+		return
+	} else {
+		if m.Text != "hello field!" {
+			t.Error("expect hello field! got", m.Text)
+			return
+		}
+	}
 	field.Close()
-	time.Sleep(1 * time.Second)
+	field.WithLock(func(f *Field) {
+		if len(f.Wizards) != 0 {
+			t.Error("expect", 0, "got", len(f.Wizards))
+		}
+		for w, _ := range f.Wizards {
+			if w.Closed() {
+				t.Error("expect", w.Name, "is Closed", "got", "not")
+			}
+		}
+	})
 
 }
 

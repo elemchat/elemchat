@@ -1,10 +1,8 @@
 package field
 
 import (
-	"fmt"
 	"sync"
 
-	"github.com/elemchat/elemchat/msg"
 	"github.com/elemchat/elemchat/wizard"
 )
 
@@ -15,7 +13,9 @@ type Field struct {
 	closed  bool
 }
 
-func New() *Field {
+type HandleFunc func(wizard.Message)
+
+func New(handle HandleFunc) *Field {
 	f := &Field{
 		Mutex:   sync.Mutex{},
 		Wizards: make(map[*wizard.Wizard]struct{}),
@@ -23,7 +23,7 @@ func New() *Field {
 		closed:  false,
 	}
 
-	go f.loop()
+	go f.loop(handle)
 	return f
 }
 
@@ -48,6 +48,7 @@ func (f *Field) Close() {
 
 		for w, _ := range f.Wizards {
 			w.Close(true)
+			delete(f.Wizards, w)
 		}
 		close(f.recv)
 		f.closed = true
@@ -56,6 +57,10 @@ func (f *Field) Close() {
 
 func (f *Field) Enter(fn func(recv chan<- wizard.Message) *wizard.Wizard) {
 	f.WithLock(func(f *Field) {
+		if f.closed {
+			return
+		}
+
 		w := fn(f.recv)
 		if w != nil {
 			f.Wizards[w] = struct{}{}
@@ -63,20 +68,16 @@ func (f *Field) Enter(fn func(recv chan<- wizard.Message) *wizard.Wizard) {
 	})
 }
 
-func (f *Field) loop() {
+func (f *Field) loop(handle HandleFunc) {
+	if handle == nil {
+		f.Close()
+		return
+	}
 	for message := range f.recv {
 		if message.Msg() == nil {
 			continue
 		}
 
-		switch msg.GetType(message.Msg()) {
-		case msg.CHAT:
-			f.WithLock(func(f *Field) {
-				fmt.Printf("[%s] %s\n",
-					message.Wizard().Name,
-					message.Msg().(*msg.Chat).Text,
-				)
-			})
-		}
+		handle(message)
 	}
 }
