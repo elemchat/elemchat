@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elemchat/elemchat/magic"
+	"github.com/elemchat/elemchat/wizard/attr"
 )
 
 var (
@@ -49,6 +50,7 @@ type Auth struct {
 	Password string `json:"password"`
 }
 type Init struct {
+	Attrs map[string]attr.Attr `json:"attrs"`
 }
 
 type WaitChat struct {
