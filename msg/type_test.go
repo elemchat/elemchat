@@ -13,6 +13,7 @@ type case_type_string struct {
 
 var cases = []case_type_string{
 	{ILLEGAL, "illegal", nil},
+	{AUTH, "auth", &Auth{}},
 	{INIT, "init", &Init{}},
 	{WAIT_CHAT, "waitChat", &WaitChat{}},
 	{WAIT_MAGIC, "waitMagic", &WaitMagic{}},

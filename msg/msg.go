@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	_ Message = &Auth{}
 	_ Message = &Init{}
 	_ Message = &WaitChat{}
 	_ Message = &WaitMagic{}
@@ -24,6 +25,10 @@ func GetType(msg Message) Type {
 	return msg._type()
 }
 
+type Auth struct {
+	UserName string `json:"username"`
+	Password string `json:"password"`
+}
 type Init struct {
 }
 
@@ -49,6 +54,9 @@ type Effect struct {
 type Dualover struct {
 }
 
+func (_ *Auth) _type() Type {
+	return AUTH
+}
 func (_ *Init) _type() Type {
 	return INIT
 }

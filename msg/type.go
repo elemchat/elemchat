@@ -10,6 +10,7 @@ type Type int
 
 const (
 	ILLEGAL Type = iota
+	AUTH
 	INIT
 	WAIT_CHAT
 	WAIT_MAGIC
@@ -26,6 +27,8 @@ func (t Type) String() string {
 	switch t {
 	case ILLEGAL:
 		return "illegal"
+	case AUTH:
+		return "auth"
 	case INIT:
 		return "init"
 	case WAIT_CHAT:
@@ -49,6 +52,8 @@ func ToType(t string) Type {
 	switch t {
 	case "illegal":
 		return ILLEGAL
+	case "auth":
+		return AUTH
 	case "init":
 		return INIT
 	case "waitChat":
@@ -80,6 +85,8 @@ func Decode(t Type, fn DecodeFunc) (Message, error) {
 	switch t {
 	case ILLEGAL:
 		return nil, ErrIllegal
+	case AUTH:
+		return unmarshalMsg(&Auth{})
 	case INIT:
 		return unmarshalMsg(&Init{})
 	case WAIT_CHAT:
