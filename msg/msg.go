@@ -132,6 +132,7 @@ type Magic struct {
 	Magic magic.Magic `json:"magic"`
 }
 type Effect struct {
+	Diff attr.Diff `json:"diff"`
 }
 
 type Dualover struct {
