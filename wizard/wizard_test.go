@@ -8,6 +8,7 @@ import (
 	"github.com/elemchat/elemchat/codec"
 	"github.com/elemchat/elemchat/conn"
 	"github.com/elemchat/elemchat/msg"
+	"github.com/elemchat/elemchat/wizard/attr"
 )
 
 func TestNew_Send(t *testing.T) {
@@ -16,7 +17,7 @@ func TestNew_Send(t *testing.T) {
 	defer c.Close()
 
 	recv := make(chan Message)
-	w := New("wizard", Attr{Blood: 10}, c, codec.JsonCodec(), recv)
+	w := New("wizard", attr.Attr{Blood: 10}, c, codec.JsonCodec(), recv)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
@@ -61,7 +62,7 @@ func TestNew_recvLoop(t *testing.T) {
 	defer c.Close()
 
 	recv := make(chan Message)
-	w := New("wizard", Attr{Blood: 10}, c, codec.JsonCodec(), recv)
+	w := New("wizard", attr.Attr{Blood: 10}, c, codec.JsonCodec(), recv)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)

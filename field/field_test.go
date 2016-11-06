@@ -8,6 +8,7 @@ import (
 	"github.com/elemchat/elemchat/conn"
 	"github.com/elemchat/elemchat/msg"
 	"github.com/elemchat/elemchat/wizard"
+	"github.com/elemchat/elemchat/wizard/attr"
 )
 
 func TestNew_Enter(t *testing.T) {
@@ -19,7 +20,7 @@ func TestNew_Enter(t *testing.T) {
 
 	field.Enter(func(recv chan<- wizard.Message) *wizard.Wizard {
 		return wizard.New("wizard",
-			wizard.Attr{Blood: 10}, s, codec.JsonCodec(), recv)
+			attr.Attr{Blood: 10}, s, codec.JsonCodec(), recv)
 
 	})
 

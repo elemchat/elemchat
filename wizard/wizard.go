@@ -7,12 +7,8 @@ import (
 	"github.com/elemchat/elemchat/codec"
 	"github.com/elemchat/elemchat/conn"
 	"github.com/elemchat/elemchat/msg"
+	"github.com/elemchat/elemchat/wizard/attr"
 )
-
-type AttrValue int
-type Attr struct {
-	Blood AttrValue
-}
 
 type Message interface {
 	Wizard() *Wizard
@@ -43,11 +39,11 @@ type Wizard struct {
 
 	Name string
 
-	Attr Attr
+	Attr attr.Attr
 }
 
 // Wizard do NOT close chan recv
-func New(name string, attr Attr,
+func New(name string, attr attr.Attr,
 	conn conn.Conn, codec codec.Codec, recv chan<- Message) *Wizard {
 	w := &Wizard{
 		conn:   conn,
