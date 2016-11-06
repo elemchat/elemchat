@@ -45,6 +45,11 @@ func GetType(msg Message) Type {
 	return msg._type()
 }
 
+type Match struct {
+	FieldURI string `json"fieldURI"`
+	Password string `json"password"`
+}
+
 type Auth struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`
@@ -138,6 +143,9 @@ type Effect struct {
 type Dualover struct {
 }
 
+func (_ *Match) _type() Type {
+	return MATCH
+}
 func (_ *Auth) _type() Type {
 	return AUTH
 }

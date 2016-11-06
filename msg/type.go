@@ -10,6 +10,7 @@ type Type int
 
 const (
 	ILLEGAL Type = iota
+	MATCH
 	AUTH
 	TIME_SYNC_REQ
 	TIME_SYNC_RESP
@@ -29,6 +30,8 @@ func (t Type) String() string {
 	switch t {
 	case ILLEGAL:
 		return "illegal"
+	case MATCH:
+		return "match"
 	case AUTH:
 		return "auth"
 	case TIME_SYNC_REQ:
@@ -58,6 +61,8 @@ func ToType(t string) Type {
 	switch t {
 	case "illegal":
 		return ILLEGAL
+	case "match":
+		return MATCH
 	case "auth":
 		return AUTH
 	case "timeSyncReq":
@@ -95,6 +100,8 @@ func Decode(t Type, fn DecodeFunc) (Message, error) {
 	switch t {
 	case ILLEGAL:
 		return nil, ErrIllegal
+	case MATCH:
+		return unmarshalMsg(&Match{})
 	case AUTH:
 		return unmarshalMsg(&Auth{})
 	case TIME_SYNC_REQ:
