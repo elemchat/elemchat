@@ -1,6 +1,7 @@
 package msg
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/elemchat/elemchat/magic"
@@ -16,6 +17,24 @@ var (
 	_ Message = &Effect{}
 	_ Message = &Dualover{}
 )
+
+type time_Time time.Time
+
+func (t time_Time) MarshalJSON() ([]byte, error) {
+	dur := time.Duration(time.Time(t).UnixNano())
+	return []byte(strconv.Itoa(int(dur / time.Millisecond))), nil
+}
+
+func (t *time_Time) UnmarshalJSON(date []byte) error {
+	unixms, err := strconv.Atoi(string(date))
+	if err != nil {
+		return err
+	}
+
+	dur := time.Duration(unixms) * time.Millisecond
+	*t = time_Time(time.Unix(0, 0).Add(dur))
+	return nil
+}
 
 type Message interface {
 	_type() Type
@@ -33,11 +52,27 @@ type Init struct {
 }
 
 type WaitChat struct {
-	Deadline time.Time `json:"deadline"`
+	Deadline time_Time `json:"deadline"`
+}
+
+func (wc WaitChat) GetDeadline() time.Time {
+	return time.Time(wc.Deadline)
+}
+func (wc *WaitChat) SetDeadline(t time.Time) *WaitChat {
+	wc.Deadline = time_Time(t)
+	return wc
 }
 
 type WaitMagic struct {
-	Deadline time.Time `json:"deadline"`
+	Deadline time_Time `json:"deadline"`
+}
+
+func (wm WaitMagic) GetDeadline() time.Time {
+	return time.Time(wm.Deadline)
+}
+func (wm *WaitMagic) SetDeadline(t time.Time) *WaitMagic {
+	wm.Deadline = time_Time(t)
+	return wm
 }
 
 type Chat struct {
@@ -47,7 +82,6 @@ type Chat struct {
 type Magic struct {
 	Magic magic.Magic `json:"magic"`
 }
-
 type Effect struct {
 }
 
