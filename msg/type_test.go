@@ -13,6 +13,8 @@ type case_type_string struct {
 
 var cases = []case_type_string{
 	{ILLEGAL, "illegal", nil},
+	{PING, "ping", &Ping{}},
+	{PONG, "pong", &Pong{}},
 	{MATCH, "match", &Match{}},
 	{AUTH, "auth", &Auth{}},
 	{TIME_SYNC_REQ, "timeSyncReq", &TimeSyncReq{}},

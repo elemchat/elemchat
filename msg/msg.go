@@ -45,6 +45,9 @@ func GetType(msg Message) Type {
 	return msg._type()
 }
 
+type Ping struct{}
+type Pong struct{}
+
 type Match struct {
 	FieldURI string `json"fieldURI"`
 	Password string `json"password"`
@@ -143,6 +146,12 @@ type Effect struct {
 type Dualover struct {
 }
 
+func (_ *Ping) _type() Type {
+	return PING
+}
+func (_ *Pong) _type() Type {
+	return PONG
+}
 func (_ *Match) _type() Type {
 	return MATCH
 }
