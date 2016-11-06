@@ -1,6 +1,6 @@
 package attr
 
-type AttrValue int
+type Value int
 type Attr struct {
-	Blood AttrValue
+	Blood Value
 }
