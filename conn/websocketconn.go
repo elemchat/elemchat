@@ -3,6 +3,7 @@ package conn
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -10,12 +11,14 @@ import (
 
 type websocketConn struct {
 	ws        *websocket.Conn
+	wtMutex   *sync.Mutex
 	closeSign chan struct{}
 }
 
 func WebSocket(ws *websocket.Conn) Conn {
 	conn := &websocketConn{
 		ws:        ws,
+		wtMutex:   &sync.Mutex{},
 		closeSign: make(chan struct{}),
 	}
 	if ws == nil {
@@ -38,6 +41,9 @@ func (conn *websocketConn) Read() (msg []byte, err error) {
 }
 
 func (conn *websocketConn) Write(msg []byte) error {
+	conn.wtMutex.Lock()
+	defer conn.wtMutex.Unlock()
+
 	err := conn.ws.WriteMessage(websocket.BinaryMessage, msg)
 	if err != nil {
 		if strings.Contains(fmt.Sprint(err), "i/o timeout") {
